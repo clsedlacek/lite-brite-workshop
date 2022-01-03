@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "tsify": "^5.0.4"
+  }
+}

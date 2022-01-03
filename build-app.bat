@@ -1,0 +1,1 @@
+browserify index.ts -p [ tsify ] > ./www/scripts/index.js
