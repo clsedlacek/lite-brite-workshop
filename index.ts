@@ -1,10 +1,76 @@
 (() => {
 
+	const debugGrid = [
+			[0,3,3,3,3,3,3,3,0],
+			[0,0,0,0,0,3,3,3,3,3,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0,3,3,3,3,3,0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0,0,0,4,4,4,0,0,0,0,0,0,0,0,0,0,5,0,5,0,5,0,0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,0,5,0,5,0,0,0,0,0,0,0,0,0],
+			[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,0,5,0,5,0,0,0,0,0,0,0,0,0],
+			[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+			[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+			[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+			[0,1,1,1,1,1,1,1,1,2,2,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0],
+			[0,1,1,1,1,1,1,1,1,2,2,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0],
+			[0,1,1,1,1,1,1,1,1,2,2,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0],
+			[0,1,1,1,1,1,1,1,1,2,2,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0],
+			[0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0],
+			[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+			[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0],
+			[0,1,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+			[0,1,0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0,3,3,3,3,3,0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,3,3,3,3,3,0,0,0,0,0,0],
+			[0,3,3,3,3,3,3,3,0]
+		];
+
+	// CSS classes
+	const cellCoreClass = 'liteBriteApp__colorCell';
+
 	// defines a palette color usable for coloring grid cells
 	interface PaletteColor {
 		id: number,
 		name: string,
 		hexColor: string
+	}
+
+	// defines a color grid cell with associated HTML element
+	class ColorCell {
+		element: HTMLElement | null;
+		color: PaletteColor;
+		constructor(color: PaletteColor, element?: HTMLElement | null) {
+			this.color = color;
+			this.element = element || null;
+		}
+		updateColor(newColor: PaletteColor) {
+			const oldColor = this.color;
+			const oldColorClass = cellCoreClass + '--' + oldColor.name;
+			const newColorClass = cellCoreClass + '--' + newColor.name;
+			if (this.element) {
+				this.element.classList.remove(oldColorClass);
+				this.element.classList.add(newColorClass);
+				this.element.style.color = newColor.hexColor;
+			}
+			this.color = newColor;
+		}
 	}
 
 	// default color palette
@@ -47,7 +113,7 @@
 	];
 
 	const appState = {
-		colorGrid: [] as Array<Array<number>>,
+		colorGrid: [] as Array<Array<ColorCell>>,
 		selectedColorId: 1
 	}
 
@@ -61,6 +127,30 @@
 		return null;
 	}
 
+	// create new color grid with row sizes specified from top to bottom
+	function createGrid(rowSizes: Array<number>) {
+		const defaultColor = colorList[0];
+		const colorGrid = [];
+		for (let y=0; y<rowSizes.length; y++) {
+			const gridRow = [];
+			for (let x=0; x<rowSizes[y]; x++) {
+				const gridCell = new ColorCell(defaultColor, null);
+				gridRow.push(gridCell);
+			}
+			colorGrid.push(gridRow);
+		}
+		return colorGrid;
+	}
+
+	// resets color grid to blank pattern state
+	function resetGrid() {
+		for (let y=0; y<appState.colorGrid.length; y++) {
+			for (let x=0; x<appState.colorGrid[y].length; x++) {
+				appState.colorGrid[y][x].updateColor(colorList[0]);
+			}
+		}
+	}
+
 	// creates HTML element for clickable color cell with click event listener
 	function createColorCellElement(cellColor: PaletteColor, gridX: number, gridY: number): HTMLElement {
 		const cellCoreClass = 'liteBriteApp__colorCell';
@@ -72,15 +162,8 @@
 
 		// click event listener
 		colorCellElement.addEventListener('click', e => {
-			const oldCellColor = lookupColorId(appState.colorGrid[gridY][gridX]) || colorList[0];
 			const newCellColor = lookupColorId(appState.selectedColorId) || colorList[0];
-			const oldColorClass = cellCoreClass + '--' + oldCellColor.name;
-			const newColorClass = cellCoreClass + '--' + newCellColor.name;
-			colorCellElement.classList.remove(oldColorClass);
-			colorCellElement.classList.add(newColorClass);
-			colorCellElement.style.color = newCellColor.hexColor;
-			appState.colorGrid[gridY][gridX] = newCellColor.id;
-			console.log('changed cell '+gridX+','+gridY+' from '+oldCellColor.name+' to '+newCellColor.name);
+			appState.colorGrid[gridY][gridX].updateColor(newCellColor);
 		});
 
 		return colorCellElement;
@@ -120,9 +203,9 @@
 			const colorGridRowElement = document.createElement('div');
 			colorGridRowElement.classList.add('liteBriteApp__colorRow');
 			for (let x=0; x<appState.colorGrid[y].length; x++) {
-				const currentCellColorId = appState.colorGrid[y][x];
-				const currentCellColor = lookupColorId(currentCellColorId) || colorList[0];
+				const currentCellColor = appState.colorGrid[y][x].color;
 				const colorCellElement = createColorCellElement(currentCellColor, x, y);
+				appState.colorGrid[y][x].element = colorCellElement;
 
 				colorGridRowElement.appendChild(colorCellElement);
 			}
@@ -157,6 +240,19 @@
 		return colorListElement;
 	}
 
+	// creates HTML element for color grid reset command
+	function createGridResetElement(): HTMLElement {
+		const gridResetElement = document.createElement('button');
+		gridResetElement.classList.add('liteBriteApp__gridReset');
+		gridResetElement.innerHTML = 'Clear pattern';
+
+		gridResetElement.addEventListener('click', e=> {
+			resetGrid();
+		});
+
+		return gridResetElement;
+	}
+
 	// creates HTML element for main panel area containing tool options and other settings
 	function createPanelElement(): HTMLElement {
 		const panelContainerElement = document.createElement('div');
@@ -169,8 +265,12 @@
 		// create color selector list
 		const colorListElement = createColorListElement();
 
+		// create color grid reset button
+		const gridResetElement = createGridResetElement();
+
 		panelContainerElement.appendChild(panelTitleElement);
 		panelContainerElement.appendChild(colorListElement);
+		panelContainerElement.appendChild(gridResetElement);
 
 		return panelContainerElement;
 	}
@@ -188,48 +288,19 @@
 
 	// main function / app init
 	function init(containerElement: HTMLElement) {
-		// set temp grid layout
-		appState.colorGrid = [
-			[0,3,3,3,3,3,3,3,0],
-			[0,0,0,0,0,3,3,3,3,3,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0,3,3,3,3,3,0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0,0,0,4,4,4,0,0,0,0,0,0,0,0,0,0,5,0,5,0,5,0,0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,0,5,0,5,0,0,0,0,0,0,0,0,0],
-			[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,0,5,0,5,0,0,0,0,0,0,0,0,0],
-			[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-			[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-			[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-			[0,1,1,1,1,1,1,1,1,2,2,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0],
-			[0,1,1,1,1,1,1,1,1,2,2,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0],
-			[0,1,1,1,1,1,1,1,1,2,2,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0],
-			[0,1,1,1,1,1,1,1,1,2,2,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0],
-			[0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0],
-			[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-			[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0],
-			[0,1,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-			[0,1,0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0,3,3,3,3,3,0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,3,3,3,3,3,0,0,0,0,0,0],
-			[0,3,3,3,3,3,3,3,0]
+		const gridRowSizes = [
+			9, 16, 21, 24, 27,
+			30, 31, 32, 35, 36,
+			37, 38, 39, 40, 41,
+			42, 41, 42, 41, 42,
+			41, 42, 41, 42, 41,
+			40, 39, 38, 37, 36,
+			35, 32, 31, 30, 27,
+			24, 21, 16, 9
+
 		];
+		// init grid layout
+		appState.colorGrid = createGrid(gridRowSizes);
 
 		// init HTML UI
 		initAppHTML(containerElement);
