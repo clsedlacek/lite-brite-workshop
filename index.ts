@@ -7,7 +7,6 @@
 		hexColor: string
 	}
 
-
 	// default color palette
 	const colorList = [
 		{
@@ -50,16 +49,6 @@
 	const appState = {
 		colorGrid: [] as Array<Array<number>>,
 		selectedColorId: 1
-	}
-
-	// initialize app to required HTML container element
-	const appContainerId = 'liteBriteApp__container';
-	const appContainerElement = document.getElementById(appContainerId);
-	if (appContainerElement) {
-		init(appContainerElement);
-	}
-	else {
-		throw 'App container element #liteBriteApp-container not found, cannot initialize app';
 	}
 
 	// lookup color from color list via ID number
@@ -247,6 +236,17 @@
 
 		// done
 		console.log('App initialized');
+	}
+
+
+	// initialize app to required HTML container element
+	const appContainerId = 'liteBriteApp__container';
+	const appContainerElement = document.getElementById(appContainerId);
+	if (appContainerElement) {
+		init(appContainerElement);
+	}
+	else {
+		throw 'App container element #liteBriteApp-container not found, cannot initialize app';
 	}
 
 
