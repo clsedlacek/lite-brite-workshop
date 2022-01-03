@@ -161,6 +161,14 @@
 		colorCellElement.style.color = cellColor.hexColor;
 
 		// click event listener
+		colorCellElement.addEventListener('mouseenter', e => {
+			// update cell color if left mouse button is pressed
+			if (e.buttons === 1) {
+				const newCellColor = lookupColorId(appState.selectedColorId) || colorList[0];
+				appState.colorGrid[gridY][gridX].updateColor(newCellColor);
+			}
+		});
+
 		colorCellElement.addEventListener('click', e => {
 			const newCellColor = lookupColorId(appState.selectedColorId) || colorList[0];
 			appState.colorGrid[gridY][gridX].updateColor(newCellColor);
