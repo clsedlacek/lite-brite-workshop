@@ -1,0 +1,115 @@
+html {
+	background: #eeeeee;
+}
+
+h1, h2, h3 {
+	font-family: 'Helvetica', 'Arial', 'sans-serif';
+}
+
+h1 {
+	font-size:  1rem;
+}
+
+h2 {
+	font-size:  1.1rem;
+}
+
+.liteBriteApp__container button {
+	cursor: pointer;
+}
+
+.liteBriteApp__container, .liteBriteApp__workspace, .liteBriteApp__panel, .liteBriteApp__colorGrid, .liteBriteApp__colorRow, .liteBriteApp__colorCell {
+	box-sizing: border-box;
+}
+
+.liteBriteApp__container {
+	background: #888888;
+}
+
+.liteBriteApp__workspace, .liteBriteApp__panel {
+	display: block;
+	margin: 0;
+	width: 100%;
+}
+
+.liteBriteApp__colorGrid, .liteBriteApp__colorCell {
+	background: #3c3c3c;
+}
+
+.liteBriteApp__colorGrid {
+	border-radius: 50%;
+	border: 2.5vw solid #eee;
+	margin: 0 auto;
+	padding: 0.9vw 0;
+	width: 100%;
+	min-width: 900px;
+}
+
+.liteBriteApp__colorRow {
+	width: 100%;
+	text-align: center;
+}
+
+.liteBriteApp__colorCell {
+	border: 0;
+	margin: 0;
+	padding: 0.2vw 0.35vw;
+	line-height: 0.5vw;
+	font-size: 1.1vw;
+}
+
+.liteBriteApp__panel {
+	padding: 0 1vw 1vw 1vw;
+	background: #3c3c3c;
+	color: #f3f3f3;
+}
+
+.liteBriteApp__colorList {
+	margin: 0;
+	padding: 0;
+	text-indent: 0;
+}
+
+.liteBriteApp__colorSelect {
+	border: 0.3em solid transparent;
+	margin: 0;
+	padding: 0.5em;
+	width: 50%;
+	font-size: 1.1em;
+}
+
+.liteBriteApp__colorSelect--selected {
+	border: 0.3em solid rgba(255, 0, 0, 0.7);
+	font-weight: bold;
+}
+
+.liteBriteApp__colorSelect--None {
+	color: #f3f3f3;
+}
+
+@media (min-width: 1400px) {
+	.liteBriteApp__workspace, .liteBriteApp__panel {
+		display: inline-block;
+		vertical-align: top;
+	}
+
+	.liteBriteApp__workspace {
+		padding: 2vw 7vw;
+		width: 75%;
+	}
+
+	.liteBriteApp__colorCell {
+		padding: 0.2vw;
+		font-size: 0.95vw;
+	}
+
+	.liteBriteApp__panel {
+		width: 25%;
+	}
+}
+
+@media (min-width: 1860px) {
+	.liteBriteApp__colorCell {
+		font-size:  0.88vw;
+	}
+}
