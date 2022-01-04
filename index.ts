@@ -405,6 +405,7 @@
 
 	function createImportExportElement(): HTMLElement {
 		const importExportElement = document.createElement('div');
+		importExportElement.classList.add('liteBriteApp__importExport');
 
 		const textField = document.createElement('textarea');
 		textField.classList.add('liteBriteApp__importExportText');
