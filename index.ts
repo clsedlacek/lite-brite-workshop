@@ -114,7 +114,10 @@
 
 	const appState = {
 		colorGrid: [] as Array<Array<ColorCell>>,
-		selectedColorId: 1
+		gridHistory: [] as Array<Array<Array<ColorCell>>>,
+		historyStepsBack: 0,
+		selectedColorId: 1,
+		isDrawing: false
 	}
 
 	// lookup color from color list via ID number
@@ -151,6 +154,66 @@
 		}
 	}
 
+	// refreshes visual display of a grid including HTML elements
+	// for loading pattern, undo/redo, etc.
+	function refreshGridDisplay(grid: Array<Array<ColorCell>>) {
+		for (let y=0; y<grid.length; y++) {
+			for (let x=0; x<grid[y].length; x++) {
+				const cell = grid[y][x];
+				cell.updateColor(cell.color);
+			}
+		}
+	}
+
+	// copies grid structure keeping same HTML element instances
+	function copyGridState(grid: Array<Array<ColorCell>>): Array<Array<ColorCell>> {
+		const copyGrid = [];
+		for (let y=0; y<grid.length; y++) {
+			const copyRow = [];
+			for (let x=0; x<grid[y].length; x++) {
+				const originalCell = grid[y][x];
+				const copyCell = new ColorCell(originalCell.color, originalCell.element);
+				copyRow.push(copyCell);
+			}
+			copyGrid.push(copyRow);
+		}
+		return copyGrid;
+	}
+
+	// add grid snapshot to history
+	function addGridHistory(grid: Array<Array<ColorCell>>) {
+		removeGridHistoryFuture();
+		const historyGrid = copyGridState(grid);
+		appState.gridHistory.push(historyGrid);
+	}
+
+	// retrieve grid snapshot from history
+	function getGridHistoryStep(offset: number): Array<Array<ColorCell>> | null {
+		if (appState.gridHistory.length - offset > 0) {
+			const index = appState.gridHistory.length - 1 - offset;
+			return appState.gridHistory[index];
+		}
+		return null;
+	}
+
+	// restores grid history at offset to app state
+	function restoreGridHistoryStep(offset: number) {
+		const historyGrid = getGridHistoryStep(offset);
+		if (historyGrid) {
+			const displayGrid = copyGridState(historyGrid);
+			appState.colorGrid = displayGrid;
+			refreshGridDisplay(appState.colorGrid);
+		}
+	}
+
+	// makes current grid history most current by removing steps newer than current snapshot and resetting step offset
+	function removeGridHistoryFuture() {
+		const finalIndex = appState.gridHistory.length - 1;
+		const index = finalIndex - (appState.historyStepsBack - 1);
+		appState.gridHistory.splice(index, finalIndex);
+		appState.historyStepsBack = 0;
+	}
+
 	// creates HTML element for clickable color cell with click event listener
 	function createColorCellElement(cellColor: PaletteColor, gridX: number, gridY: number): HTMLElement {
 		const cellCoreClass = 'liteBriteApp__colorCell';
@@ -160,18 +223,29 @@
 		colorCellElement.classList.add(cellCoreClass, cellColorClass);
 		colorCellElement.style.color = cellColor.hexColor;
 
-		// click event listener
-		colorCellElement.addEventListener('mouseenter', e => {
-			// update cell color if left mouse button is pressed
+		colorCellElement.addEventListener('mousedown', e => {
 			if (e.buttons === 1) {
+				appState.isDrawing = true;
+
 				const newCellColor = lookupColorId(appState.selectedColorId) || colorList[0];
 				appState.colorGrid[gridY][gridX].updateColor(newCellColor);
 			}
 		});
 
-		colorCellElement.addEventListener('click', e => {
-			const newCellColor = lookupColorId(appState.selectedColorId) || colorList[0];
-			appState.colorGrid[gridY][gridX].updateColor(newCellColor);
+		colorCellElement.addEventListener('mouseup', e => {
+			if (appState.isDrawing) {
+				// update undo/redo history
+				addGridHistory(appState.colorGrid);
+			}
+			appState.isDrawing = false;
+		});
+
+		colorCellElement.addEventListener('mouseenter', e => {
+			// update cell color if left mouse button is pressed
+			if (appState.isDrawing) {
+				const newCellColor = lookupColorId(appState.selectedColorId) || colorList[0];
+				appState.colorGrid[gridY][gridX].updateColor(newCellColor);
+			}
 		});
 
 		return colorCellElement;
@@ -248,6 +322,40 @@
 		return colorListElement;
 	}
 
+	// creates HTML element for undo command
+	function createUndoElement(): HTMLElement {
+		const undoElement = document.createElement('button');
+		undoElement.classList.add('liteBriteApp__undo');
+		undoElement.innerHTML = 'Undo';
+
+		undoElement.addEventListener('click', e => {
+			const newOffset = appState.historyStepsBack + 1;
+			if (getGridHistoryStep(newOffset)) {
+				appState.historyStepsBack = newOffset;
+				restoreGridHistoryStep(newOffset);
+			}
+		})
+
+		return undoElement;
+	}
+
+	// creates HTML element for redo command
+	function createRedoElement(): HTMLElement {
+		const redoElement = document.createElement('button');
+		redoElement.classList.add('liteBriteApp__redo');
+		redoElement.innerHTML = 'Redo';
+
+		redoElement.addEventListener('click', e => {
+			const newOffset = appState.historyStepsBack - 1;
+			if (getGridHistoryStep(newOffset)) {
+				appState.historyStepsBack = newOffset;
+				restoreGridHistoryStep(newOffset);
+			}
+		})
+
+		return redoElement;
+	}
+
 	// creates HTML element for color grid reset command
 	function createGridResetElement(): HTMLElement {
 		const gridResetElement = document.createElement('button');
@@ -256,6 +364,7 @@
 
 		gridResetElement.addEventListener('click', e=> {
 			resetGrid();
+			addGridHistory(appState.colorGrid);
 		});
 
 		return gridResetElement;
@@ -273,11 +382,17 @@
 		// create color selector list
 		const colorListElement = createColorListElement();
 
+		// create undo/redo buttons
+		const undoElement = createUndoElement();
+		const redoElement = createRedoElement();
+
 		// create color grid reset button
 		const gridResetElement = createGridResetElement();
 
 		panelContainerElement.appendChild(panelTitleElement);
 		panelContainerElement.appendChild(colorListElement);
+		panelContainerElement.appendChild(undoElement);
+		panelContainerElement.appendChild(redoElement);
 		panelContainerElement.appendChild(gridResetElement);
 
 		return panelContainerElement;
@@ -312,6 +427,9 @@
 
 		// init HTML UI
 		initAppHTML(containerElement);
+
+		// init grid drawing history
+		addGridHistory(appState.colorGrid);
 
 		// done
 		console.log('App initialized');
