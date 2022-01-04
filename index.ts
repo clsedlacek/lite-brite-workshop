@@ -144,6 +144,7 @@
 				}
 			}
 		}
+		addGridHistory(appState.colorGrid);
 	}
 
 	// generate export data for grid
