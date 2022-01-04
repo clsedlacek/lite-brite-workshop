@@ -45,6 +45,10 @@
 	// CSS classes
 	const cellCoreClass = 'liteBriteApp__colorCell';
 
+	interface GridImportData {
+		grid: Array<Array<number>>
+	}
+
 	// defines a palette color usable for coloring grid cells
 	interface PaletteColor {
 		id: number,
@@ -128,6 +132,35 @@
 			}
 		}	
 		return null;
+	}
+
+	// import grid from export data
+	function importGrid(importData: GridImportData) {
+		for (let y=0; y<importData.grid.length; y++) {
+			for (let x=0; x<importData.grid[y].length; x++) {
+				const color = lookupColorId(importData.grid[y][x]);
+				if (appState.colorGrid[y] && appState.colorGrid[y][x] && color) {
+					appState.colorGrid[y][x].updateColor(color);
+				}
+			}
+		}
+	}
+
+	// generate export data for grid
+	function exportGrid(grid: Array<Array<ColorCell>>): GridImportData {
+		const exportData = {
+			grid: [] as Array<Array<number>>
+		};
+
+		for (let y=0; y<grid.length; y++) {
+			const exportRow = [];
+			for (let x=0; x<grid[y].length; x++) {
+				exportRow.push(grid[y][x].color.id);
+			}
+			exportData.grid.push(exportRow);
+		}
+
+		return exportData;
 	}
 
 	// create new color grid with row sizes specified from top to bottom
@@ -370,6 +403,48 @@
 		return gridResetElement;
 	}
 
+	function createImportExportElement(): HTMLElement {
+		const importExportElement = document.createElement('div');
+
+		const textField = document.createElement('textarea');
+		textField.classList.add('liteBriteApp__importExportText');
+
+		const importButton = document.createElement('button');
+		importButton.classList.add('liteBriteApp__import');
+		importButton.innerHTML = 'Import';
+
+		const exportButton = document.createElement('button');
+		exportButton.classList.add('liteBriteApp__export');
+		exportButton.innerHTML = 'Export';
+
+		importButton.addEventListener('click', e => {
+			try {
+				const importData = JSON.parse(textField.value) as GridImportData;
+				importGrid(importData);
+			}
+			catch {
+				console.log('Could not parse pattern import data');
+				console.dir(textField);
+			}
+		});
+
+		exportButton.addEventListener('click', e => {
+			try {
+				const exportData = JSON.stringify(exportGrid(appState.colorGrid));
+				textField.value = exportData;
+			}
+			catch {
+				throw 'Could not export pattern data';
+			}
+		});
+
+		importExportElement.appendChild(textField);
+		importExportElement.appendChild(importButton);
+		importExportElement.appendChild(exportButton);
+
+		return importExportElement;
+	}
+
 	// creates HTML element for main panel area containing tool options and other settings
 	function createPanelElement(): HTMLElement {
 		const panelContainerElement = document.createElement('div');
@@ -389,11 +464,15 @@
 		// create color grid reset button
 		const gridResetElement = createGridResetElement();
 
+		// create import/export UI
+		const importExportElement = createImportExportElement();
+
 		panelContainerElement.appendChild(panelTitleElement);
 		panelContainerElement.appendChild(colorListElement);
 		panelContainerElement.appendChild(undoElement);
 		panelContainerElement.appendChild(redoElement);
 		panelContainerElement.appendChild(gridResetElement);
+		panelContainerElement.appendChild(importExportElement);
 
 		return panelContainerElement;
 	}
