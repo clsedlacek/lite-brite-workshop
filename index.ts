@@ -44,7 +44,10 @@
 
 	// CSS classes / HTML IDs
 	const cellCoreClass = 'liteBriteApp__colorCell';
+	const gridPortraitClass = 'liteBriteApp__colorGrid--portrait';
+	const gridLandscapeClass = 'liteBriteApp__colorGrid--landscape';
 	const countDisplayId = 'liteBriteApp__colorCount';
+	const gridElementId = 'liteBriteApp__colorGrid';
 
 	interface GridImportData {
 		grid: Array<Array<number>>
@@ -392,6 +395,8 @@
 	function createColorGridElement(): HTMLElement {
 		const colorGridContainerElement = document.createElement('div');
 		colorGridContainerElement.classList.add('liteBriteApp__colorGrid')
+		colorGridContainerElement.id = gridElementId;
+
 		for (let y=0; y<appState.colorGrid.length; y++) {
 			const colorGridRowElement = document.createElement('div');
 			colorGridRowElement.classList.add('liteBriteApp__colorRow');
@@ -467,6 +472,38 @@
 		return redoElement;
 	}
 
+	function createPortraitElement(): HTMLElement {
+		const portraitElement = document.createElement('button');
+		portraitElement.classList.add('liteBriteApp__portrait');
+		portraitElement.innerHTML = 'Portrait';
+
+		portraitElement.addEventListener('click', e => {
+			const gridElement = document.getElementById(gridElementId);
+			if (gridElement) {
+				gridElement.classList.remove(gridLandscapeClass);
+				gridElement.classList.add(gridPortraitClass);
+			}
+		});
+
+		return portraitElement;
+	}
+
+	function createLandscapeElement(): HTMLElement {
+		const landscapeElement = document.createElement('button');
+		landscapeElement.classList.add('liteBriteApp__landscape');
+		landscapeElement.innerHTML = 'Landscape';
+
+		landscapeElement.addEventListener('click', e => {
+			const gridElement = document.getElementById(gridElementId);
+			if (gridElement) {
+				gridElement.classList.remove(gridPortraitClass);
+				gridElement.classList.add(gridLandscapeClass);
+			}
+		});
+
+		return landscapeElement;
+	}
+
 	// creates HTML element for color grid reset command
 	function createGridResetElement(): HTMLElement {
 		const gridResetElement = document.createElement('button');
@@ -540,6 +577,9 @@
 		const undoElement = createUndoElement();
 		const redoElement = createRedoElement();
 
+		const landscapeElement = createLandscapeElement();
+		const portraitElement = createPortraitElement();
+
 		// create color grid reset button
 		const gridResetElement = createGridResetElement();
 
@@ -550,6 +590,8 @@
 		panelContainerElement.appendChild(colorListElement);
 		panelContainerElement.appendChild(undoElement);
 		panelContainerElement.appendChild(redoElement);
+		panelContainerElement.appendChild(landscapeElement);
+		panelContainerElement.appendChild(portraitElement);
 		panelContainerElement.appendChild(gridResetElement);
 		panelContainerElement.appendChild(importExportElement);
 
