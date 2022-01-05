@@ -1,8 +1,9 @@
 html {
+	font-size: 16px;
 	background: #eeeeee;
 }
 
-h1, h2, h3 {
+h1, h2, h3, .liteBriteApp__colorSelect button {
 	font-family: 'Helvetica', 'Arial', 'sans-serif';
 }
 
@@ -18,7 +19,7 @@ h2 {
 	cursor: pointer;
 }
 
-.liteBriteApp__container, .liteBriteApp__workspace, .liteBriteApp__panel, .liteBriteApp__colorGrid, .liteBriteApp__colorRow, .liteBriteApp__colorCell {
+.liteBriteApp__container, .liteBriteApp__workspace, .liteBriteApp__panel, .liteBriteApp__colorGrid, .liteBriteApp__colorRow, .liteBriteApp__colorCell, .liteBriteApp__colorSelect {
 	box-sizing: border-box;
 }
 
@@ -65,26 +66,46 @@ h2 {
 }
 
 .liteBriteApp__colorList {
-	margin: 0;
+	margin: 0 0 2rem 0;
 	padding: 0;
 	text-indent: 0;
+	list-style: none;
 }
 
 .liteBriteApp__colorSelect {
-	border: 0.3em solid transparent;
+	display: inline-block;
+	vertical-align: top;
+	border: 8px solid transparent;
 	margin: 0;
-	padding: 0.5em;
+	padding: 0.2em;
 	width: 50%;
-	font-size: 1.1em;
 }
 
 .liteBriteApp__colorSelect--selected {
-	border: 0.3em solid rgba(255, 0, 0, 0.7);
+	border-color: #dddddd;
 	font-weight: bold;
 }
 
-.liteBriteApp__colorSelect--None {
+.liteBriteApp__colorSelect--None button {
 	color: #f3f3f3;
+}
+
+.liteBriteApp__colorSelect button {
+	border: 0;
+	padding: 1rem;
+	width: 100%;
+	font-size: 1rem;
+	font-weight: bold;
+	text-align: left;
+}
+
+.liteBriteApp__colorCount {
+	display: block;
+	float: right;
+}
+
+.liteBriteApp__colorCount--negative {
+	color: #dd2222;
 }
 
 @media (min-width: 1400px) {
