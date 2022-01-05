@@ -42,8 +42,9 @@
 			[0,3,3,3,3,3,3,3,0]
 		];
 
-	// CSS classes
+	// CSS classes / HTML IDs
 	const cellCoreClass = 'liteBriteApp__colorCell';
+	const countDisplayId = 'liteBriteApp__colorCount';
 
 	interface GridImportData {
 		grid: Array<Array<number>>
@@ -53,7 +54,8 @@
 	interface PaletteColor {
 		id: number,
 		name: string,
-		hexColor: string
+		hexColor: string,
+		maxAvailable: number | null // null indicates unlimited available
 	}
 
 	// defines a color grid cell with associated HTML element
@@ -68,12 +70,52 @@
 			const oldColor = this.color;
 			const oldColorClass = cellCoreClass + '--' + oldColor.name;
 			const newColorClass = cellCoreClass + '--' + newColor.name;
+			const negativeCountClass = 'liteBriteApp__colorCount--negative';
+
 			if (this.element) {
 				this.element.classList.remove(oldColorClass);
 				this.element.classList.add(newColorClass);
 				this.element.style.color = newColor.hexColor;
 			}
 			this.color = newColor;
+
+			const oldColorCountElement = document.getElementById(countDisplayId + oldColor.id);
+			const newColorCountElement = document.getElementById(countDisplayId + newColor.id);
+			const oldColorCount = countGridColor(appState.colorGrid, oldColor);
+			const newColorCount = countGridColor(appState.colorGrid, newColor);
+
+			if (oldColorCountElement) {
+				oldColorCountElement.classList.remove(negativeCountClass);
+			}
+			if (newColorCountElement) {
+				newColorCountElement.classList.remove(negativeCountClass);
+			}
+
+			let oldColorAvailableDisplay = '';
+			let newColorAvailableDisplay = '';
+
+			if (oldColor.maxAvailable !== null) {
+				const oldColorAvailable = (oldColor.maxAvailable - oldColorCount);
+				oldColorAvailableDisplay = oldColorAvailable.toString() + ' left';
+				if (oldColorAvailable < 0 && oldColorCountElement) {
+					oldColorCountElement.classList.add(negativeCountClass);
+				}
+			}
+
+			if (newColor.maxAvailable !== null) {
+				const newColorAvailable = (newColor.maxAvailable - newColorCount);
+				newColorAvailableDisplay = newColorAvailable.toString() + ' left';
+				if (newColorAvailable < 0 && newColorCountElement) {
+					newColorCountElement.classList.add(negativeCountClass);
+				}
+			}
+
+			if (oldColorCountElement) {
+				oldColorCountElement.innerHTML = oldColorAvailableDisplay;
+			}
+			if (newColorCountElement) {
+				newColorCountElement.innerHTML = newColorAvailableDisplay;
+			}
 		}
 	}
 
@@ -82,37 +124,44 @@
 		{
 			id: 0,
 			name: 'None',
-			hexColor: '#222222'
+			hexColor: '#222222',
+			maxAvailable: null
 		},
 		{
 			id: 1,
 			name: 'White',
-			hexColor: '#e0e0e0'
+			hexColor: '#e0e0e0',
+			maxAvailable: 114
 		},
 		{
 			id: 2,
 			name: 'Pink',
-			hexColor: '#dd44dd'
+			hexColor: '#dd44dd',
+			maxAvailable: 120
 		},
 		{
 			id: 3,
 			name: 'Blue',
-			hexColor: '#22dddd'
+			hexColor: '#22dddd',
+			maxAvailable: 112
 		},
 		{
 			id: 4,
 			name: 'Orange',
-			hexColor: '#ffaa22'
+			hexColor: '#ffaa22',
+			maxAvailable: 106
 		},
 		{
 			id: 5,
 			name: 'Green',
-			hexColor: '#22dd22'
+			hexColor: '#22dd22',
+			maxAvailable: 131
 		},
 		{
 			id: 6,
 			name: 'Yellow',
-			hexColor: '#dddd22'
+			hexColor: '#dddd22',
+			maxAvailable: 110
 		},
 	];
 
@@ -165,7 +214,7 @@
 	}
 
 	// create new color grid with row sizes specified from top to bottom
-	function createGrid(rowSizes: Array<number>) {
+	function createGrid(rowSizes: Array<number>) { // TODO ADD RETURN TYPE SIGNATURE
 		const defaultColor = colorList[0];
 		const colorGrid = [];
 		for (let y=0; y<rowSizes.length; y++) {
@@ -248,6 +297,19 @@
 		appState.historyStepsBack = 0;
 	}
 
+	// counts how many of a specified color is used on grid
+	function countGridColor(grid: Array<Array<ColorCell>>, color: PaletteColor): number {
+		let count = 0;
+		for (let y=0; y<grid.length; y++) {
+			for (let x=0; x<grid[y].length; x++) {
+				if (grid[y][x].color === color) {
+					count = count + 1;
+				}
+			}
+		}
+		return count;
+	}
+
 	// creates HTML element for clickable color cell with click event listener
 	function createColorCellElement(cellColor: PaletteColor, gridX: number, gridY: number): HTMLElement {
 		const cellCoreClass = 'liteBriteApp__colorCell';
@@ -287,16 +349,25 @@
 
 	// creates HTML element for active color selection button with click event listener
 	function createColorSelectElement(cellColor: PaletteColor): HTMLElement {
-		const colorButtonCoreClass = 'liteBriteApp__colorSelect';
-		const specificColorClass = colorButtonCoreClass + '--' + cellColor.name;
-		const selectedClass = colorButtonCoreClass + '--selected';
+		const colorSelectCoreClass = 'liteBriteApp__colorSelect';
+		const specificColorClass = colorSelectCoreClass + '--' + cellColor.name;
+		const selectedClass = colorSelectCoreClass + '--selected';
+
+		const colorSelectElement = document.createElement('li');
 		const colorButtonElement = document.createElement('button');
-		colorButtonElement.innerHTML = cellColor.name;
-		colorButtonElement.classList.add(colorButtonCoreClass, specificColorClass);
+		const colorCountElement = document.createElement('span');
+
+		colorSelectElement.classList.add(colorSelectCoreClass, specificColorClass);
 		if (appState.selectedColorId === cellColor.id) {
-			colorButtonElement.classList.add(selectedClass);
+			colorSelectElement.classList.add(selectedClass);
 		}
+
+		colorButtonElement.innerHTML = cellColor.name;
 		colorButtonElement.style.background = cellColor.hexColor;
+
+		colorCountElement.classList.add('liteBriteApp__colorCount');
+		colorCountElement.id = countDisplayId + cellColor.id;
+		colorCountElement.innerHTML = (cellColor.maxAvailable !== null) ? (cellColor.maxAvailable.toString() + ' left') : '';
 
 		// click event
 		colorButtonElement.addEventListener('click', e => {
@@ -306,9 +377,15 @@
 			for (let b = 0; b<colorButtons.length; b++) {
 				colorButtons[b].classList.remove(selectedClass);
 			}
-			colorButtonElement.classList.add(selectedClass);
+			colorSelectElement.classList.add(selectedClass);
 		});
-		return colorButtonElement;
+
+		if (cellColor.maxAvailable !== null) {
+			colorButtonElement.appendChild(colorCountElement);
+		}
+		colorSelectElement.appendChild(colorButtonElement);
+
+		return colorSelectElement;
 	}
 
 	// creates HTML element with proper children for color grid container
