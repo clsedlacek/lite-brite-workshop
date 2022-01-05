@@ -46,6 +46,12 @@ h2 {
 	min-width: 900px;
 }
 
+.liteBriteApp__colorGrid--portrait {
+	margin-top: 5vw;
+	margin-bottom: 5vw;
+	transform: rotate(90deg);
+}
+
 .liteBriteApp__colorRow {
 	width: 100%;
 	text-align: center;
