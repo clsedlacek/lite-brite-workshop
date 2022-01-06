@@ -53,6 +53,13 @@
 		grid: Array<Array<number>>
 	}
 
+	interface ColorMode {
+		id: number,
+		title: string,
+		colors: Array<string>,
+		cycleTime: number | null
+	}
+
 	// maps color values per light mode
 	interface ModeColorList {
 		white: string,
@@ -90,7 +97,7 @@
 			if (this.element) {
 				this.element.classList.remove(oldColorClass);
 				this.element.classList.add(newColorClass);
-				this.element.style.color = newColor.modeHexColors[appState.colorMode as keyof ModeColorList];
+				this.element.style.color = newColor.modeHexColors[appState.colorMode.colors[appState.colorCycleIndex] as keyof ModeColorList];
 			}
 			this.color = newColor;
 
@@ -133,6 +140,33 @@
 			}
 		}
 	}
+
+	const colorModes = [
+		{
+			id: 1,
+			title: 'White',
+			colors: ['white'],
+			cycleTime: null
+		},
+		{
+			id: 2,
+			title: 'Animate Slow',
+			colors: ['red', 'blue'],
+			cycleTime: 1000
+		},
+		{
+			id: 3,
+			title: 'Animate Fast',
+			colors: ['red', 'blue'],
+			cycleTime: 500
+		},
+		{
+			id: 4,
+			title: 'Rainbow Flash',
+			colors: ['red', 'orange', 'yellow', 'green', 'blue', 'indigo'],
+			cycleTime: 1000
+		}
+	];
 
 	// default color palette
 	const colorList = [
@@ -255,17 +289,29 @@
 		gridHistory: [] as Array<Array<Array<ColorCell>>>,
 		historyStepsBack: 0,
 		selectedColorId: 1,
-		colorMode: 'white',
+		colorMode: colorModes[0],
+		colorCycleIndex: 0,
+		colorCycleTimeoutId: null as number | null,
 		isDrawing: false
 	}
 
 	// lookup color from color list via ID number
-	function lookupColorId(colorId: number) {
+	function lookupColorId(colorId: number): PaletteColor | null {
 		for (let i=0; i<colorList.length; i++) {
 			if (colorId === colorList[i].id) {
 				return colorList[i];
 			}
 		}	
+		return null;
+	}
+
+	// lookup color light mode from list via ID number
+	function lookupColorModeId(modeId: number): ColorMode | null {
+		for (let i=0; i<colorModes.length; i++) {
+			if (modeId === colorModes[i].id) {
+				return colorModes[i];
+			}
+		}
 		return null;
 	}
 
@@ -403,7 +449,7 @@
 		const colorCellElement = document.createElement('button');
 		colorCellElement.innerHTML = '\u2B24 ';
 		colorCellElement.classList.add(cellCoreClass, cellColorClass);
-		colorCellElement.style.color = cellColor.modeHexColors[appState.colorMode as keyof ModeColorList];
+		colorCellElement.style.color = cellColor.modeHexColors[appState.colorMode.colors[appState.colorCycleIndex] as keyof ModeColorList];
 
 		colorCellElement.addEventListener('mousedown', e => {
 			if (e.buttons === 1) {
@@ -601,6 +647,24 @@
 		return gridResetElement;
 	}
 
+	function createColorModeElement(): HTMLElement {
+		const colorModeElement = document.createElement('select');
+		colorModeElement.value = colorModes[0].id.toString();
+		for (let i=0; i<colorModes.length; i++) {
+			const optionElement = document.createElement('option');
+			optionElement.innerHTML = colorModes[i].title;
+			optionElement.value = colorModes[i].id.toString();
+			colorModeElement.appendChild(optionElement);
+		}
+
+		colorModeElement.addEventListener('change', e => {
+			appState.colorCycleIndex = 0;
+			appState.colorMode = lookupColorModeId(parseInt(colorModeElement.value)) || colorModes[0];
+			restartColorCycle();
+		});
+		return colorModeElement;
+	}
+
 	function createImportExportElement(): HTMLElement {
 		const importExportElement = document.createElement('div');
 		importExportElement.classList.add('liteBriteApp__importExport');
@@ -666,6 +730,10 @@
 		// create color grid reset button
 		const gridResetElement = createGridResetElement();
 
+
+		// create color mode switcher
+		const colorModeElement = createColorModeElement();
+
 		// create import/export UI
 		const importExportElement = createImportExportElement();
 
@@ -676,6 +744,7 @@
 		panelContainerElement.appendChild(landscapeElement);
 		panelContainerElement.appendChild(portraitElement);
 		panelContainerElement.appendChild(gridResetElement);
+		panelContainerElement.appendChild(colorModeElement);
 		panelContainerElement.appendChild(importExportElement);
 
 		return panelContainerElement;
@@ -690,6 +759,35 @@
 		// finish UI build by appending all to app container
 		containerElement.appendChild(workspaceContainerElement);
 		containerElement.appendChild(panelContainerElement);
+	}
+
+	function setColorCycleTimeout() {
+		const mode = appState.colorMode;
+		if (mode.cycleTime) {
+			appState.colorCycleTimeoutId = setTimeout(() => {
+				const maxCycleIndex = (mode.colors.length - 1);
+				if (appState.colorCycleIndex >= maxCycleIndex) {
+					appState.colorCycleIndex = 0;
+				}
+				else {
+					appState.colorCycleIndex = appState.colorCycleIndex + 1;
+				}
+				refreshGridDisplay(appState.colorGrid);
+				setColorCycleTimeout();
+			}, mode.cycleTime);
+		}
+		else {
+			appState.colorCycleTimeoutId = null;
+		}
+	}
+
+	function restartColorCycle() {
+		if (appState.colorCycleTimeoutId !== null) {
+			clearTimeout(appState.colorCycleTimeoutId);
+		}
+		appState.colorCycleIndex = 0;
+		refreshGridDisplay(appState.colorGrid);
+		setColorCycleTimeout();
 	}
 
 	// main function / app init
@@ -713,6 +811,8 @@
 
 		// init grid drawing history
 		addGridHistory(appState.colorGrid);
+
+		restartColorCycle();
 
 		// done
 		console.log('App initialized');
